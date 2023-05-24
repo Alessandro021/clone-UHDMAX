@@ -16,6 +16,7 @@ export default function AppLayoutTabs(){
             <Tabs.Screen 
             name="index"
             options={{
+                // href: "/home",
                 title: "Inicio",
                 tabBarIcon: ({color, size}) => {return <MaterialCommunityIcons name="home" size={size} color={color} />},
                               
@@ -51,6 +52,12 @@ export default function AppLayoutTabs(){
             options={{
                 title: "Canais",
                 tabBarIcon: ({color, size}) => {return <Feather name="tv" size={size} color={color} />}
+            }}
+            />
+            <Tabs.Screen 
+            name="home"
+            options={{
+                href: null,
             }}
             />
         </Tabs>

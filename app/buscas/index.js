@@ -1,9 +1,12 @@
+import { Link } from "expo-router";
 import { View, Text, StyleSheet } from "react-native";
+
 
 export default function Busca(){
     return (
         <View style={styles.container}>
             <Text>Busca</Text>
+            <Link href="/home/ver"><Text>VER TELA VER</Text></Link>
         </View>
     )
 }
