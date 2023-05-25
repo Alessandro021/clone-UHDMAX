@@ -1,67 +1,9 @@
-import { Tabs, Stack} from "expo-router";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Feather from '@expo/vector-icons/Feather';
+import { Stack } from "expo-router";
 
-export default function AppLayoutTabs(){
+export default function AppLayoutScreen(){
     return (
-        <>
-        <Tabs
-            screenOptions={{
-                headerShown: false,  
-                tabBarStyle: {height: 80, backgroundColor: "#121212", paddingBottom: 20, borderTopWidth: 0},
-                tabBarActiveTintColor: "#FFFFFF",
-                tabBarInactiveTintColor: "#737373",
-            }}
-        >
-            <Tabs.Screen 
-            name="index"
-            options={{
-                // href: "/home",
-                title: "Inicio",
-                tabBarIcon: ({color, size}) => {return <MaterialCommunityIcons name="home" size={size} color={color} />},
-                              
-            }}
-            />
-
-            <Tabs.Screen 
-            name="buscas"
-            options={{
-                title: "Busca",
-                tabBarIcon: ({color, size}) => {return <Feather name="search" size={size} color={color} />}
-            }}
-            />
-
-            <Tabs.Screen 
-            name="filmes"
-            options={{
-                title: "Filmes",
-                tabBarIcon: ({color, size}) => {return <MaterialCommunityIcons name="filmstrip-box" size={size} color={color} />}
-            }}
-            />
-
-            <Tabs.Screen 
-            name="series"
-            options={{
-                title: "Series",
-                tabBarIcon: ({color, size}) => {return <MaterialCommunityIcons name="filmstrip" size={size} color={color} />}
-            }}
-            />
-
-            <Tabs.Screen 
-            name="canais"
-            options={{
-                title: "Canais",
-                tabBarIcon: ({color, size}) => {return <Feather name="tv" size={size} color={color} />}
-            }}
-            />
-            <Tabs.Screen 
-            name="home"
-            options={{
-                href: null,
-            }}
-            />
-        </Tabs>
-        </>
-        
+        <Stack screenOptions={{animation: "slide_from_right"}}>
+            <Stack.Screen name="(tabs)" options={{headerShown: false}} />
+        </Stack>
     )
 }

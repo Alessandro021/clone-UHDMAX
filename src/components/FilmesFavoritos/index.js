@@ -1,27 +1,22 @@
 import {FlatList,View,Text, Image, TouchableOpacity, StyleSheet, ImageBackground} from "react-native";
-import Icon from "@expo/vector-icons/Feather"
+import { useRouter } from "expo-router";
 
 export default function Filmes({data, index, serie}){
+    const router = useRouter();
     return(
-        // <FlatList style={{ flex: 1}}
-        //     data={data}
-        //     keyExtractor={(item) => item.id.toString()}
-        //     horizontal={true}
-        //     // ItemSeparatorComponent={<View style={{width: 5}}/>}
-        //     renderItem={({ item }) => (
-                <TouchableOpacity onPress={{}}>
-                    <View>
-                        <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${data.backdrop_path}` }} style={styles.img}>
-                        { index !== undefined && <Text style={styles.textTop5} >{index}</Text>}
-                        {serie && 
-                        <View style={styles.viewEpisodio}>
-                            <Text style={styles.textEpisodio}>NOVOS EPISODIOS</Text>
-                        </View>}
-                        </ImageBackground>
-                    </View>
-                </TouchableOpacity>
-        //     )}
-        // />
+        data.backdrop_path &&
+        <TouchableOpacity onPress={() => router.push({ pathname: 'ver', params: {img: data.backdrop_path, desc: data.overview, titulo: data.title  }  })} activeOpacity={0.9}>
+            <View>
+                <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${data.backdrop_path}` }} style={styles.img}>
+                { index !== undefined && <Text style={styles.textTop5} >{index}</Text>}
+                {serie && 
+                <View style={styles.viewEpisodio}>
+                    <Text style={styles.textEpisodio}>NOVOS EPISODIOS</Text>
+                </View>}
+                </ImageBackground>
+            </View>
+        </TouchableOpacity>
+
     )
 }
 const styles = StyleSheet.create({
@@ -29,7 +24,7 @@ const styles = StyleSheet.create({
         width: 120,
         height: 170,
         borderRadius: 5,
-        marginHorizontal: 15,
+        marginHorizontal: 10,
         alignItems: "center"
     },
     textTop5: {

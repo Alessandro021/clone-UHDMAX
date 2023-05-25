@@ -3,12 +3,13 @@ import { Link } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Play  from '@expo/vector-icons/Ionicons';
 import Info  from '@expo/vector-icons/MaterialCommunityIcons';
-import Filmes from "../../src/components/FilmesFavoritos";
+import Filmes from "../../../src/components/FilmesFavoritos";
+import Person from "../../../src/components/Person";
 
-import ImageFundo from "../../src/assets/filme.jpg"
-import Logo from "../../src/assets/icon.png"
-import { api } from "../../src/server/api";
-import { useEffect, useLayoutEffect, useState } from "react";
+// import ImageFundo from "../../src/assets/filme.jpg"
+import Logo from "../../../src/assets/icon.png"
+import { api } from "../../../src/server/api";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 // import { SafeAreaView } from "react-native-safe-area-context";
 
 
@@ -57,8 +58,8 @@ const [capa, setCapa] = useState([])
             page: 1,
         }
     })
-
-    setPerson(data.results[0])
+    // console.log(data.results)
+    setPerson(data.results)
  } 
  async function getFilmePopular(){
     const {data} = await api.get("movie/popular", {
@@ -71,6 +72,24 @@ const [capa, setCapa] = useState([])
 
     setFilmePopular(data.results)
  } 
+
+
+ const  renderItemTop5 = useCallback(({item, index}) => (
+    <Filmes data={item} index={index + 1}/>
+ ),[])
+
+ const  renderItemFilmesPopular = useCallback(({item}) => (
+    <Filmes data={item}/>
+ ),[])
+
+ const  renderItemFilmes = useCallback(({item}) => (
+    <Filmes data={item}/>
+ ),[])
+ const  renderItemSeries = useCallback(({item}) => (
+    <Filmes data={item} serie={true} />
+ ),[])
+
+
     useLayoutEffect(() => {
         getFilmes()
         getPerson()
@@ -148,7 +167,7 @@ const [capa, setCapa] = useState([])
                     data={Series}
                     keyExtractor={(item) => item.id.toString()}
                     horizontal={true}
-                    renderItem={({ item }) =>  <Filmes data={item} serie={true} />}
+                    renderItem={renderItemSeries}
                 />
             </View>
 
@@ -158,7 +177,7 @@ const [capa, setCapa] = useState([])
                     data={top5}
                     keyExtractor={(item) => item.id.toString()}
                     horizontal={true}
-                    renderItem={({ item, index}) =>  <Filmes data={item} index={index + 1}/>}
+                    renderItem={renderItemTop5}
                 />
             </View>
             
@@ -169,7 +188,7 @@ const [capa, setCapa] = useState([])
                     data={filmes}
                     keyExtractor={(item) => item.id.toString()}
                     horizontal={true}
-                    renderItem={({ item }) =>  <Filmes data={item} />}
+                    renderItem={renderItemFilmes}
                 />
             </View>
 
@@ -179,14 +198,24 @@ const [capa, setCapa] = useState([])
                     data={filmePopular}
                     keyExtractor={(item) => item.id.toString()}
                     horizontal={true}
-                    renderItem={({ item }) =>  <Filmes data={item} />}
+                    renderItem={renderItemFilmesPopular}
                 />
             </View>
 
-            <View>
+            <View style={[styles.ViewCardsFilmes, {marginBottom: 50}]} >
+                <Text style={styles.TituloCards}>Atores Populares</Text>
+                <FlatList
+                    data={person}
+                    keyExtractor={(item) => item.id.toString()}
+                    horizontal={true}
+                    renderItem={({item}) => <Person data={item} /> }
+                />
+            </View>
+
+            {/* <View>
                 <Image resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${person.profile_path}`}} style={styles.img}/>
 
-            </View>
+            </View> */}
 
         </ScrollView>
     )
