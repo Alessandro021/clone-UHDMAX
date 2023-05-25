@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Image, StatusBar, ImageBackground, ScrollView, TouchableOpacity, tou, FlatList} from "react-native";
-import { Link } from "expo-router";
+import { Link , useRouter} from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Play  from '@expo/vector-icons/Ionicons';
 import Info  from '@expo/vector-icons/MaterialCommunityIcons';
@@ -16,6 +16,8 @@ import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 
 export default function Home(){
 const {top} = useSafeAreaInsets();
+const router = useRouter();
+
 
 const [filmes, setFilmes] = useState([])
 const [Series, setSeries] = useState([])
@@ -138,13 +140,13 @@ const [capa, setCapa] = useState([])
                         </TouchableOpacity>
 
                         <View style={styles.viewAssistir}>
-                            <TouchableOpacity style={styles.bntAssistir} activeOpacity={0.9}>
+                            <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: {id: capa.id }})} style={styles.bntAssistir} activeOpacity={0.9}>
                                 <Play name="play" size={30} color={"#000"} />
                                 <Text style={styles.textAssistir}>Assistir</Text>
                             </TouchableOpacity>
                         </View>
                         
-                        <TouchableOpacity style={styles.bntTrailer} activeOpacity={0.9}>
+                        <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: {id: capa.id }})} style={styles.bntTrailer} activeOpacity={0.9}>
                             <View style={styles.iconContainer}>
                                 <Info style={styles.iconTrailer} name="information-outline" size={25} color={"#FFFFFF"} />
                             </View>

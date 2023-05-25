@@ -3,27 +3,55 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import Play  from '@expo/vector-icons/Ionicons';
 import Download  from '@expo/vector-icons/MaterialCommunityIcons';
 import Icon  from '@expo/vector-icons/Fontisto';
+import { useEffect, useState} from "react";
+import {api} from "../../src/server/api"
+import Filmes from "../../src/components/FilmesFavoritos";
 
 
-export default function Ver(){
-    const {titulo, desc, img} = useLocalSearchParams();
+export default function VerFilme(){
+    const {id} = useLocalSearchParams();
+    const [filme, setFilme] = useState({})
+    const [similares, setSimilares] = useState([])
+    const [categ, setCateg] = useState("")
+    async function getFilme(){
+        const {data} = await api.get(`/movie/${id}`,{
+            params:{
+                api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
+                language: "pt-BR",
+            }
+            
+        })
+        setFilme(data)
+    }
+
+    function categoria(){
+        let categoria = []
+        {filme.title && (categoria = filme.genres?.map(item => (item.name)))}
+        setCateg(categoria.join(', '))
+    }
+   
+
+    useEffect(() => {
+        getFilme()
+        categoria()
+    }, [])
     return (
         <View style={styles.container}>
             <Stack.Screen options={{title: "", headerStyle: {backgroundColor: "#000"}, headerTintColor: "#FFF"}} />
-            <ImageBackground style={styles.img} source={{uri: `https://image.tmdb.org/t/p/original${img}`}}>
+            <ImageBackground style={styles.img} source={{uri: `https://image.tmdb.org/t/p/original${filme.backdrop_path}`}}>
 
             </ImageBackground>
 
             <View style={styles.content}>
-                <Text style={styles.title}>{titulo}</Text>
+                <Text style={styles.title}>{filme.title}</Text>
 
                 <View style={styles.viewInfo}>
                     <Text style={styles.infoRelevante}>50% relevante</Text>
-                    <Text style={styles.infoData}>2022</Text>
+                    <Text style={styles.infoData}>{filme.release_date?.slice(0,4)}</Text>
                     <View style={styles.viewPonto}>
-                        <Text style={styles.textPonto}>7.1</Text>
+                        <Text style={styles.textPonto}>{filme.vote_average?.toFixed(1)}</Text>
                     </View>
-                    <Text style={styles.textTempo}>169min.</Text>
+                    <Text style={styles.textTempo}>{filme.runtime}min.</Text>
                 </View>
 
                 <TouchableOpacity style={styles.bntAssistir} >
@@ -36,9 +64,9 @@ export default function Ver(){
                     <Text style={styles.textDownload}>Baixar</Text>
                 </TouchableOpacity>
 
-                <Text style={styles.descricao}>{desc}</Text>
+                <Text style={styles.descricao}>{filme.overview}</Text>
 
-                <Text style={styles.genero}>Genero: Ação, Comedia</Text>
+                <Text style={styles.genero}><Text style={{fontWeight: "900"}}>Genero:</Text> {categ}</Text>
 
                 <View style={styles.viewAction}>
                     <TouchableOpacity style={styles.bntAction} activeOpacity={0.9}>
@@ -61,7 +89,6 @@ export default function Ver(){
                 </View>
 
                 <Text style={styles.tituloEnd}>TITULOS RECOMENDADOS</Text>
-
             </View>
         </View>
     )

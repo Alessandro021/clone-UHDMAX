@@ -5,7 +5,7 @@ export default function Filmes({data, index, serie}){
     const router = useRouter();
     return(
         data.backdrop_path &&
-        <TouchableOpacity onPress={() => router.push({ pathname: 'ver', params: {img: data.backdrop_path, desc: data.overview, titulo: data.title  }  })} activeOpacity={0.9}>
+        <TouchableOpacity onPress={() => router.push({ pathname: serie ? 'verSerie' : 'verFilme', params: {id: data.id }  })} activeOpacity={0.9}>
             <View>
                 <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${data.backdrop_path}` }} style={styles.img}>
                 { index !== undefined && <Text style={styles.textTop5} >{index}</Text>}
