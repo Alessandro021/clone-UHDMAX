@@ -5,6 +5,8 @@ import Play  from '@expo/vector-icons/Ionicons';
 import Info  from '@expo/vector-icons/MaterialCommunityIcons';
 import Filmes from "../../../src/components/FilmesFavoritos";
 import Person from "../../../src/components/Person";
+import {LinearGradient} from 'expo-linear-gradient'
+
 
 // import ImageFundo from "../../src/assets/filme.jpg"
 import Logo from "../../../src/assets/icon.png"
@@ -40,10 +42,13 @@ const [capa, setCapa] = useState([])
     setCapa(data.results[3])
  }
  async function getSeries(){
-    const {data} = await api.get("tv/popular", {
+    const {data} = await api.get("/tv/top_rated", {
         params:{
             api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
             language: "pt-BR",
+            // sort_by: 'popularity.desc',
+            // region: 'BR',
+            // with_original_language: 'pt',
             page: 1,
         }
     })
@@ -109,6 +114,10 @@ const [capa, setCapa] = useState([])
 
             <ImageBackground resizeMode="cover" source={{uri: `https://image.tmdb.org/t/p/original${capa.poster_path}`}} style={styles.backgroundImage}>
                 {/*HEADER */}
+                <LinearGradient
+                    style={styles.gradient}
+                    colors={['rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.30)', 'rgba(0,0,0,1)']}
+                />
                 <View style={[styles.header, {marginTop: top}]}>
                     <View style={styles.viewLogo}>
                         <Image source={Logo} style={styles.logo} />
@@ -249,6 +258,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     header: {
+        zIndex: 98,
         width: "100%",
         flexDirection: "row",
         alignItems: "center",
@@ -277,6 +287,7 @@ const styles = StyleSheet.create({
     /*STYLE DAS INFORMAÇOES DENTRO DO IMAGEBACKGROUND */
 
     content: {
+        zIndex: 99,
         width: "100%",
         // height: 250,
         flexDirection: "column",
@@ -389,6 +400,15 @@ const styles = StyleSheet.create({
         fontWeight: "900",
         marginBottom: 10,
         marginLeft: 10
+    },
+    gradient:{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: 720,
+        zIndex: 1,
+        backgroundColor: 'transparent'
     }
 
 })

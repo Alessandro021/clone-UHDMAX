@@ -10,7 +10,7 @@ dayjs.locale(ptBr)
     const router = useRouter();
     return(
         data.poster_path  && (
-            <TouchableOpacity style={styles.bnt} onPress={() => router.push({ pathname:'verFilme', params: {id: data.id }  })} activeOpacity={0.9}>
+            <TouchableOpacity style={styles.bnt} onPress={() => router.push({ pathname: serie ? 'verSerie' : 'verFilme', params: {id: data.id }  })} activeOpacity={0.9}>
                 
                     <Image resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${data?.poster_path}` }} style={styles.img}/>
                     <View style={styles.viewImage}>

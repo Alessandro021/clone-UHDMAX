@@ -30,6 +30,8 @@ export default function Busca(){
         <ListarFilme data={item} />
      ),[])
 
+  
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle="light-content" />
@@ -54,15 +56,17 @@ export default function Busca(){
                 </View>
             </View >
 
-            {filmes ? 
+            {filmes.length > 0 ? 
             (
-                <FlatList 
-                    data={filmes}
-                    keyExtractor={(item) => item.id.toString()}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={renderItem}
-                    numColumns={3}
-                />
+                <View style={styles.viewList}>
+                    <FlatList 
+                        data={filmes}
+                        keyExtractor={(item) => item.id.toString()}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={renderItem}
+                        numColumns={3}
+                    />
+                </View>
             ): 
             (
                     <View style={styles.viewImage}>
@@ -123,6 +127,10 @@ const styles = StyleSheet.create({
         fontWeight: "500",
         fontSize: 16,
         textAlign: "center"
+    },
+    viewList: {
+        flex: 1,
+        marginVertical: 20,
     }
 
 })

@@ -4,6 +4,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { View, Text, StyleSheet, Image, StatusBar, ImageBackground, ScrollView, TouchableOpacity, tou, FlatList} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import  {api}  from "../../src/server/api";
+import {LinearGradient} from 'expo-linear-gradient'
 
 
 import Play  from '@expo/vector-icons/Ionicons';
@@ -16,7 +17,7 @@ import ListarFilme from "../../src/components/ListarFilme";
 
 
 export default function Person(){
-    const {id} = useLocalSearchParams();
+    const {id, name} = useLocalSearchParams();
     const {top} = useSafeAreaInsets();
     const router = useRouter();
 
@@ -53,11 +54,17 @@ export default function Person(){
             <View style={styles.ViewCardsFilmes} >
                 <FlatList
                     ListHeaderComponent={
+                        <>
                         <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${capa?.poster_path}` }} style={styles.backgroundImage}>
+
+                            <LinearGradient
+                                style={styles.gradient}
+                                colors={['rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.30)', 'rgba(0,0,0,1)']}
+                            />
 
                             <View style={[styles.header, { marginTop: top }]}>
                                 <TouchableOpacity onPress={() => router.push("/home")} style={styles.bntVoltar}>
-                                    <Voltar name="md-arrow-back-outline" size={24} color={"#000"} />
+                                    <Voltar name="md-arrow-back-outline" size={24} color={"#FFF"} />
                                 </TouchableOpacity>
                             </View>
 
@@ -98,9 +105,10 @@ export default function Person(){
                                         <Text style={styles.textTrailer}>Saiba Mais</Text>
                                     </TouchableOpacity>
                                 </View>
-
                             </View>
                         </ImageBackground>
+                        <Text style={styles.name}>{name}</Text>
+                        </>
                     }
                     data={filmes}
                     keyExtractor={(item) => item.id.toString()}
@@ -133,6 +141,7 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
     header: {
+        zIndex: 98,
         marginHorizontal: 20,
         width: 30,
         height: 30,
@@ -145,6 +154,7 @@ const styles = StyleSheet.create({
     /*STYLE DAS INFORMAÇOES DENTRO DO IMAGEBACKGROUND */
 
     content: {
+        zIndex: 99,
         flex: 1,
         flexDirection: "column",
         alignItems: "center",
@@ -239,4 +249,21 @@ const styles = StyleSheet.create({
     ViewCardsFilmes: {
         flex: 1,
     },
+
+    name: {
+        color: "#FFFFFF",
+        marginBottom: 30,
+        marginLeft: 10,
+        fontSize: 30,
+        fontWeight: "900",
+    },
+    gradient:{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: 720,
+        zIndex: 1,
+        backgroundColor: 'transparent'
+    }
 })

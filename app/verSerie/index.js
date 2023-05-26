@@ -20,8 +20,6 @@ export default function VerSerie(){
             }
             
         })
-    console.log(data)
-
         setFilme(data)
     }
 
