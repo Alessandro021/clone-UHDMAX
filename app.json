@@ -2,6 +2,14 @@
   "expo": {
     "scheme": "acme",
     "name": "clone-UHDMAX",
-    "slug": "clone-UHDMAX"
+    "slug": "clone-UHDMAX",
+    "extra": {
+      "eas": {
+        "projectId": "b59dd560-b24d-4ba2-991b-f6b3c4df65c9"
+      }
+    },
+    "android": {
+      "package": "com.cenna.cloneUHDMAX"
+    }
   }
 }

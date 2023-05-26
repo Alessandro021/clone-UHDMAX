@@ -1,13 +1,14 @@
+import { memo } from "react";
 import {FlatList,View,Text, Image, TouchableOpacity, StyleSheet, ImageBackground} from "react-native";
 import { useRouter } from "expo-router";
 
-export default function Filmes({data, index, serie}){
+ const Filmes = ({data, index, serie}) => {
     const router = useRouter();
     return(
         data.backdrop_path &&
         <TouchableOpacity onPress={() => router.push({ pathname: serie ? 'verSerie' : 'verFilme', params: {id: data.id }  })} activeOpacity={0.9}>
             <View>
-                <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${data.backdrop_path}` }} style={styles.img}>
+                <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${data.poster_path}` }} style={styles.img}>
                 { index !== undefined && <Text style={styles.textTop5} >{index}</Text>}
                 {serie && 
                 <View style={styles.viewEpisodio}>
@@ -19,6 +20,8 @@ export default function Filmes({data, index, serie}){
 
     )
 }
+
+export default memo(Filmes)
 const styles = StyleSheet.create({
     img: {
         width: 120,

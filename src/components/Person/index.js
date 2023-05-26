@@ -6,9 +6,9 @@ export default function Person({data}){
     const router = useRouter()
     return(
         
-    // data.backdrop_path &&
+    data.profile_path &&
         
-        <TouchableOpacity onPress={() =>router.push("/home/ver") } activeOpacity={0.9}>
+        <TouchableOpacity onPress={() => router.push({ pathname: "person", params: {id: data.id }  })}>
             <View>
                 <Image resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${data.profile_path}`}} style={styles.img}/>
             </View>

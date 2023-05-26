@@ -33,6 +33,7 @@ export default function VerFilme(){
 
     useEffect(() => {
         getFilme()
+        // console.log(filme.genres[].name)
         categoria()
     }, [])
     return (

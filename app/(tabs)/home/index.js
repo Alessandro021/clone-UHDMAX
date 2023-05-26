@@ -97,6 +97,10 @@ const [capa, setCapa] = useState([])
         getPerson()
         getSeries()
         getFilmePopular()
+
+    return () => {
+
+    }
     },[])
 
     return (
@@ -169,6 +173,7 @@ const [capa, setCapa] = useState([])
                     data={Series}
                     keyExtractor={(item) => item.id.toString()}
                     horizontal={true}
+                    showsHorizontalScrollIndicator={false}
                     renderItem={renderItemSeries}
                 />
             </View>
@@ -179,6 +184,7 @@ const [capa, setCapa] = useState([])
                     data={top5}
                     keyExtractor={(item) => item.id.toString()}
                     horizontal={true}
+                    showsHorizontalScrollIndicator={false}
                     renderItem={renderItemTop5}
                 />
             </View>
@@ -190,6 +196,7 @@ const [capa, setCapa] = useState([])
                     data={filmes}
                     keyExtractor={(item) => item.id.toString()}
                     horizontal={true}
+                    showsHorizontalScrollIndicator={false}
                     renderItem={renderItemFilmes}
                 />
             </View>
@@ -200,6 +207,7 @@ const [capa, setCapa] = useState([])
                     data={filmePopular}
                     keyExtractor={(item) => item.id.toString()}
                     horizontal={true}
+                    showsHorizontalScrollIndicator={false}
                     renderItem={renderItemFilmesPopular}
                 />
             </View>
@@ -210,6 +218,7 @@ const [capa, setCapa] = useState([])
                     data={person}
                     keyExtractor={(item) => item.id.toString()}
                     horizontal={true}
+                    showsHorizontalScrollIndicator={false}
                     renderItem={({item}) => <Person data={item} /> }
                 />
             </View>
@@ -301,6 +310,7 @@ const styles = StyleSheet.create({
         alignContent: "center",
         justifyContent: "center",
         marginTop: 10,
+        gap: 10
     },
     viewIconTop:{
         width: 20,

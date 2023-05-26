@@ -10,6 +10,7 @@ export default function AppLayoutTabs(){
                 tabBarStyle: {height: 80, backgroundColor: "#121212", paddingBottom: 20, borderTopWidth: 0},
                 tabBarActiveTintColor: "#FFFFFF",
                 tabBarInactiveTintColor: "#737373",
+                tabBarHideOnKeyboard: true,
             }}
         >
             <Tabs.Screen 
