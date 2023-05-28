@@ -5,14 +5,22 @@ import Download  from '@expo/vector-icons/MaterialCommunityIcons';
 import Icon  from '@expo/vector-icons/Fontisto';
 import { useEffect, useState} from "react";
 import {api} from "../../src/server/api"
-import Filmes from "../../src/components/FilmesFavoritos";
 
+
+import Temporadas from "../../src/components/Temporadas";
 
 export default function VerSerie(){
     const {id} = useLocalSearchParams();
-    const [filme, setFilme] = useState({})
-    const [categ, setCateg] = useState("")
-    async function getFilme(){
+    const [serie, setSerie] = useState({})
+    const [temporadas, setTemporadas] = useState([])
+    const [categ, setCateg] = useState()
+
+    let numTemp = null
+
+
+    async function getSerie(){
+        let category = []
+
         const {data} = await api.get(`/tv/${id}`,{
             params:{
                 api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
@@ -20,51 +28,56 @@ export default function VerSerie(){
             }
             
         })
-        setFilme(data)
+        setSerie(data)
+        numTemp = data.number_of_seasons
+
+        category =  data.genres.map(item => (item.name))
+        setCateg(category.join(', '))
+        
     }
 
-    function categoria(){
-        let categoria = []
-        {filme.title && (categoria = filme.genres?.map(item => (item.name)))}
-        setCateg(categoria.join(', '))
+    async function getTemporadas(temporadas){
+        const {data} = await api.get(`/tv/${id}/season/${temporadas}`,{
+            params:{
+                api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
+                language: "pt-BR",
+            }
+            
+        })
+        setTemporadas(data.episodes)
     }
+
    
     useEffect(() => {
-        getFilme()
-        categoria()
+        getSerie().then(() => getTemporadas(numTemp))
     }, [])
     return (
         <View style={styles.container}>
             <Stack.Screen options={{title: "", headerStyle: {backgroundColor: "#000"}, headerTintColor: "#FFF"}} />
-            <ImageBackground style={styles.img} source={{uri: `https://image.tmdb.org/t/p/original${filme.backdrop_path}`}}>
+            <ImageBackground style={styles.img} source={{uri: `https://image.tmdb.org/t/p/original${serie.backdrop_path}`}}>
 
             </ImageBackground>
 
             <View style={styles.content}>
-                <Text style={styles.title}>{filme.name}</Text>
+                <Text style={styles.title}>{serie.name}</Text>
 
                 <View style={styles.viewInfo}>
                     <Text style={styles.infoRelevante}>50% relevante</Text>
-                    <Text style={styles.infoData}>{filme.last_air_date?.slice(0,4)}</Text>
+                    <Text style={styles.infoData}>{serie.last_air_date?.slice(0,4)}</Text>
                     <View style={styles.viewPonto}>
-                        <Text style={styles.textPonto}>{filme.vote_average?.toFixed(1)}</Text>
+                        <Text style={styles.textPonto}>{serie.vote_average?.toFixed(1)}</Text>
                     </View>
-                    <Text style={styles.textTempo}>{filme.episode_run_time}min.</Text>
+                    <Text style={styles.textTempo}>{serie.number_of_seasons} Temporadas HD</Text>
                 </View>
 
                 <TouchableOpacity style={styles.bntAssistir} >
-                    <Play name="play" size={30} color={"#000"} />
-                    <Text style={styles.textAssistir}>Assistir</Text>
+                    {/* <Play name="play" size={30} color={"#000"} /> */}
+                    <Text style={styles.textAssistir}>Session {serie.number_of_seasons} Temporada(as) disponiveis</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.bntDownload} >
-                    <Download name="download" size={30} color={"#FFF"} />
-                    <Text style={styles.textDownload}>Baixar</Text>
-                </TouchableOpacity>
+                <Text style={styles.descricao}>{serie.overview}</Text>
 
-                <Text style={styles.descricao}>{filme.overview}</Text>
-
-                <Text style={styles.genero}><Text style={{fontWeight: "900"}}>Genero:</Text> {categ}</Text>
+                <Text style={styles.genero}><Text style={{fontWeight: "900"}}>Genero: </Text> {categ}</Text>
 
                 <View style={styles.viewAction}>
                     <TouchableOpacity style={styles.bntAction} activeOpacity={0.9}>
@@ -81,13 +94,17 @@ export default function VerSerie(){
                         <Text style={styles.textAction}>Salvar favoritos</Text>
                     </TouchableOpacity>
                 </View>
-
-                <View style={{height: 2, backgroundColor: "#1A1A1A" }}>
-                    <View style={{height: 4, width: "50%", backgroundColor: "#9D1FFF" }} />
-                </View>
-
-                <Text style={styles.tituloEnd}>TITULOS RECOMENDADOS</Text>
             </View>
+
+            <View style={{ height: 2, backgroundColor: "#1A1A1A" }}>
+                <View style={{ height: 4, width: "50%", backgroundColor: "#9D1FFF" }} />
+            </View>
+
+            <Text style={styles.tituloEnd}>TITULOS RECOMENDADOS</Text>
+
+            <Temporadas />
+            <Temporadas />
+            <Temporadas />
         </View>
     )
 }
@@ -102,7 +119,7 @@ const styles = StyleSheet.create({
         height: 260
     },
     content: {
-        flex: 1,
+        // flex: 1,
         marginHorizontal: 20,
         gap: 10
     },
@@ -142,18 +159,9 @@ const styles = StyleSheet.create({
         borderRadius: 5
     },
     textAssistir: {
-        fontWeight: "900"
-    },
-    bntDownload: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: "#1A1A1A",
-        justifyContent: "center",
-        borderRadius: 5
-    },
-    textDownload: {
         fontWeight: "900",
-        color: "#FFF"
+        padding: 10,
+        fontSize: 16
     },
     descricao: {
         color: '#fff',
@@ -186,6 +194,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: "900",
-        marginTop: 5
+        marginTop: 5,
+        margin: 20,
     }
 })

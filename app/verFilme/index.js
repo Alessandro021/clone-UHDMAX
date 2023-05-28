@@ -13,7 +13,10 @@ export default function VerFilme(){
     const [filme, setFilme] = useState({})
     const [similares, setSimilares] = useState([])
     const [categ, setCateg] = useState("")
+    
+
     async function getFilme(){
+        let category = []
         const {data} = await api.get(`/movie/${id}`,{
             params:{
                 api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
@@ -22,6 +25,8 @@ export default function VerFilme(){
             
         })
         setFilme(data)
+        category =  data.genres.map(item => (item.name))
+        setCateg(category.join(', '))
     }
 
     function categoria(){
@@ -67,7 +72,7 @@ export default function VerFilme(){
 
                 <Text style={styles.descricao}>{filme.overview}</Text>
 
-                <Text style={styles.genero}><Text style={{fontWeight: "900"}}>Genero:</Text> {categ}</Text>
+                <Text style={styles.genero}><Text style={{fontWeight: "900"}}>Genero: </Text>{categ}</Text>
 
                 <View style={styles.viewAction}>
                     <TouchableOpacity style={styles.bntAction} activeOpacity={0.9}>
