@@ -1,5 +1,5 @@
 import { memo } from "react";
-import {View,Text, Image, TouchableOpacity, StyleSheet, Dimensions} from "react-native";
+import {View,Text, Image, TouchableOpacity, StyleSheet, Dimensions, FlatList, useCallback} from "react-native";
 import { useRouter } from "expo-router";
 import Play  from '@expo/vector-icons/Ionicons';
 import dayjs from "dayjs";
@@ -7,30 +7,29 @@ import ptBr from "dayjs/locale/pt-br";
 dayjs.locale(ptBr)
 
 
- const Temporads = ({data}) => {
+ const Temporads = memo(({data}) => {
     const router = useRouter();
-    return(
+    // console.log(data)
 
-        // data.still_path  && (
-            <View style={styles.container}>
+   return(
+        <View style={styles.container}>
                 {/* <Text style={styles.data}>{dayjs(data?.release_date).format("D[ de ]MMM[, ]YYYY")}</Text> */}
-                <Image resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original/aRquEWm8wWF1dfa9uZ1TXLvVrKD.jpg` }} style={styles.img}/>
+                <Image resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${data.still_path}` }} style={styles.img}/>
                 <View style={styles.viewTemEp}>
-                    <Text style={styles.textTemEp}>1 - 1</Text>
+                    <Text style={styles.textTemEp}>{data.season_number} - {data.episode_number}</Text>
                 </View>
                 <View style={styles.viewTituloEBnt}>
                     <View style={styles.viewTitulo}>
-                        <Text style={styles.textTitulo}>Eles não estava preparados</Text>
-                        <Text style={styles.textData}>set. 13, 2021</Text>
+                        <Text style={styles.textTitulo}>{data.overview?.slice(0, 15).concat("...")}</Text>
+                        <Text style={styles.textData}>{data.air_date}</Text>
                     </View>
                     <Play name="play-circle-outline" size={35} color={"#FFF"} />
                 </View>
             </View>
-        // )
     )
-}
+})
 
-export default memo(Temporads)
+export default Temporads
 
 const { width, height} = Dimensions.get("window")
 
