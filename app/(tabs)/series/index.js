@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, StatusBar, ImageBackground, ScrollView, TouchableOpacity, tou, FlatList} from "react-native";
+import { View, Text, StyleSheet, Image, StatusBar, ImageBackground, ScrollView, TouchableOpacity, Modal, FlatList} from "react-native";
 import { useRouter} from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Play  from '@expo/vector-icons/Ionicons';
@@ -12,6 +12,7 @@ import Logo from "../../../src/assets/icon.png"
 import { api } from "../../../src/server/api";
 
 import ListarFilme from "../../../src/components/ListarFilme";
+import ModalFilmes from "../../../src/components/ModalFilmes";
 
 export default function SearchSerie(){
     const {top} = useSafeAreaInsets();
@@ -21,7 +22,9 @@ export default function SearchSerie(){
     const [cont, setCont] = useState(1)
 
 
+
     async function getSeries(){
+       
         const {data} = await api.get("/tv/top_rated", {
             params:{
                 api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
@@ -37,6 +40,7 @@ export default function SearchSerie(){
      const  renderItem = useCallback(({item}) => (
         <ListarFilme data={item} serie={true}/>
      ),[])
+
 
      useEffect(() => {
         getSeries()

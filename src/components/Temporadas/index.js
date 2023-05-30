@@ -9,7 +9,6 @@ dayjs.locale(ptBr)
 
  const Temporads = memo(({data}) => {
     const router = useRouter();
-    // console.log(data)
 
    return(
         <View style={styles.container}>
@@ -20,10 +19,12 @@ dayjs.locale(ptBr)
                 </View>
                 <View style={styles.viewTituloEBnt}>
                     <View style={styles.viewTitulo}>
-                        <Text style={styles.textTitulo}>{data.overview?.slice(0, 15).concat("...")}</Text>
-                        <Text style={styles.textData}>{data.air_date}</Text>
+                        <Text style={styles.textTitulo}>{data.overview?.slice(0,25).concat("...")}</Text>
+                        <Text style={styles.textData}>{dayjs(data.air_date).format("D[ de ]MMM[, ]YYYY")}</Text>
                     </View>
-                    <Play name="play-circle-outline" size={35} color={"#FFF"} />
+                    <TouchableOpacity>
+                        <Play name="play-circle-outline" size={35} color={"#FFF"} />
+                    </TouchableOpacity>
                 </View>
             </View>
     )

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, FlatList, useCallback} from "react-native";
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, FlatList, useCallback, Modal} from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import Play from '@expo/vector-icons/Ionicons';
 import Download from '@expo/vector-icons/MaterialCommunityIcons';
@@ -9,13 +9,15 @@ import { api } from "../../src/server/api"
 
 
 import Temporadas from "../../src/components/Temporadas";
-import CardTituloTemporada from "../../src/components/CardTituloTemporada";
+import ModalTemporadas from "../../src/components/ModalTemporadas";
 
 export default function VerSerie() {
     const { id } = useLocalSearchParams();
     const [serie, setSerie] = useState({})
     const [temporadas, setTemporadas] = useState([])
     const [categ, setCateg] = useState()
+    const [numTemporada, setNumTemporada] = useState(null)
+    const [visibleModal, setVisibleModal] = useState(false)
 
     async function getSerie() {
         let category = []
@@ -28,7 +30,8 @@ export default function VerSerie() {
 
         })
         setSerie(data)
-        numTemp = data.number_of_seasons
+        // console.log(data)
+        // numTemp = data.number_of_seasons
 
         category = data.genres.map(item => (item.name))
         setCateg(category.join(', '))
@@ -47,17 +50,17 @@ export default function VerSerie() {
         // console.log(data.episodes)
     }
 
+    function buscaTemporada(valor){
+        setNumTemporada(valor)
+        getTemporadas(valor)
+    }
 
     const  renderItem = (({item}) => (
         <Temporadas data={item} />
      ))
 
-    //  const  renderSectionHeader = (({ section }) => (
-    //     <CardTituloTemporada data={section} />
-    //  ))
-
     useEffect(() => {
-        getSerie().then(() => getTemporadas(1))
+        getSerie()
     }, [])
     return (
         <View style={styles.container}>
@@ -116,16 +119,18 @@ export default function VerSerie() {
                         <Text style={styles.tituloEnd}>EPISODIOS TITULOS RECOMENDADOS</Text>
 
                         <View style={styles.viewTemporadas}>
-                            <TouchableOpacity style={styles.bntTemporadas}>
+                            <TouchableOpacity onPress={() => setVisibleModal(true)} style={styles.bntTemporadas}>
                                 <Text style={styles.textTemporadas}>Temporadas</Text>
                                 <Down name="chevron-down" size={20} color={"#FFF"} />
                             </TouchableOpacity>
                         </View>
 
-                        <View style={ styles.viewCardTemporada}>
-                            <View style={styles.viewCardCor} />
-                            <Text style={styles.textCardTemporada}>Temporada 1</Text>
-                        </View>
+                        {numTemporada && (
+                            <View style={styles.viewCardTemporada}>
+                                <View style={styles.viewCardCor} />
+                                <Text style={styles.textCardTemporada}>Temporada {numTemporada}</Text>
+                            </View>
+                        )} 
                     </View>
                     
                 }
@@ -134,6 +139,11 @@ export default function VerSerie() {
                 keyExtractor={(item) => String(item.id)}
                 renderItem={renderItem}
                 />
+
+
+                <Modal visible={visibleModal} transparent={true} onRequestClose={() => setVisibleModal(false)} animationType='fade'>
+                    <ModalTemporadas data={serie.seasons} onClose={() => setVisibleModal(false)} buscaTemporada={buscaTemporada} />
+                </Modal>
 
         </View >
     )
@@ -228,9 +238,10 @@ const styles = StyleSheet.create({
         margin: 20,
     },
     viewTemporadas: {
-          backgroundColor: "#1A1A1A",
+        backgroundColor: "#1A1A1A",
         alignSelf: "flex-start",
-        borderRadius: 8
+        borderRadius: 8,
+        marginBottom: 20
     },
     bntTemporadas: {
         flexDirection: 'row',

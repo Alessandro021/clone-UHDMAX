@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, StatusBar, ImageBackground, ScrollView, TouchableOpacity, tou, FlatList} from "react-native";
+import { View, Text, StyleSheet, Image, StatusBar, ImageBackground, ScrollView, TouchableOpacity, Modal, FlatList} from "react-native";
 import { useRouter} from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Play  from '@expo/vector-icons/Ionicons';
@@ -11,6 +11,7 @@ import Logo from "../../../src/assets/icon.png"
 import { api } from "../../../src/server/api";
 
 import ListarFilme from "../../../src/components/ListarFilme";
+import ModalFilmes from "../../../src/components/ModalFilmes";
 
 export default function SearchFilme(){
     const {top} = useSafeAreaInsets();
@@ -18,10 +19,52 @@ export default function SearchFilme(){
     const [filmes, setFilmes] = useState([])
     const [capa, setCapa] = useState([])
     const [cont, setCont] = useState(1)
+    const [visibleModal, setVisibleModal] = useState(false)
+    const [response, setResponse] = useState({titulo: "Todos os gêneros", link: "movie/now_playing"})
+
+    const categorias = [
+        {id: "1", name: "Todos os gêneros", link: "movie/now_playing" },
+        {id: "2", name: "Lançamentos", link: "movie/now_playing" },
+        {id: "3", name: "Novidades", link: "movie/now_playing" },
+        {id: "4", name: "Mais acessados", link: "movie/now_playing" },
+        {id: "5", name: "Ação", link: "/discover/movie?with_genres=28" },
+        {id: "6", name: "Aventura", link: "/discover/movie?with_genres=12" },
+        {id: "7", name: "Animação", link: "/discover/movie?with_genres=16" },
+        {id: "8", name: "Comédia", link: "/discover/movie?with_genres=35" },
+        {id: "9", name: "Crime", link: "/discover/movie?with_genres=80" },
+        {id: "10", name: "Documentário", link: "/discover/movie?with_genres=99" },
+        {id: "11", name: "Drama", link: "/discover/movie?with_genres=18" },
+        {id: "12", name: "Família", link: "/discover/movie?with_genres=10751" },
+        {id: "13", name: "Fantasia", link: "/discover/movie?with_genres=14" },
+        {id: "14", name: "História", link: "/discover/movie?with_genres=36" },
+        {id: "15", name: "Terror", link: "/discover/movie?with_genres=27" },
+        {id: "16", name: "Música", link: "/discover/movie?with_genres=10402" },
+        {id: "17", name: "Mistério", link: "/discover/movie?with_genres=9648" },
+        {id: "18", name: "Romance", link: "/discover/movie?with_genres=10749" },
+        {id: "19", name: "Ficção", link: "/discover/movie?with_genres=878" },
+        {id: "20", name: "Cinema", link: "/discover/movie?with_genres=10770" },
+        {id: "21", name: "Thriller", link: "/discover/movie?with_genres=53" },
+        {id: "22", name: "Guerra", link: "/discover/movie?with_genres=10752" },
+        {id: "23", name: "Faroeste", link: "/discover/movie?with_genres=37" },
+        {id: "24", name: "2023", link: "/discover/movie?primary_release_year=2023" },
+        {id: "25", name: "2022", link: "/discover/movie?primary_release_year=2022" },
+        {id: "26", name: "2021", link: "/discover/movie?primary_release_year=2021" },
+        {id: "27", name: "2020", link: "/discover/movie?primary_release_year=2020" },
+        {id: "28", name: "2019", link: "/discover/movie?primary_release_year=2019" },
+        {id: "29", name: "2018", link: "/discover/movie?primary_release_year=2018" },
+        {id: "30", name: "2017", link: "/discover/movie?primary_release_year=2017" },
+        {id: "31", name: "2016", link: "/discover/movie?primary_release_year=2016" },
+        {id: "32", name: "2015", link: "/discover/movie?primary_release_year=2015" },
+        {id: "33", name: "2014", link: "/discover/movie?primary_release_year=2014" },
+        {id: "34", name: "2013", link: "/discover/movie?primary_release_year=2013" },
+        {id: "35", name: "2012", link: "/discover/movie?primary_release_year=2012" },
+        {id: "36", name: "2011", link: "/discover/movie?primary_release_year=2011" },
+        {id: "37", name: "2010", link: "/discover/movie?primary_release_year=2010" },
+    ]
 
 
     async function getFilmes(){
-        const {data} = await api.get("movie/now_playing", {
+        const {data} = await api.get(`${response.link}`, {
             params:{
                 api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
                 language: "pt-BR",
@@ -33,17 +76,23 @@ export default function SearchFilme(){
         setCapa(data.results[Math.floor(Math.random() * 20)])
      }
 
+     function getResponse(response){
+        if(response.link !== undefined){
+            setResponse(response)
+            setCont(1)
+        }
+     }
+
      const  renderItem = useCallback(({item}) => (
         <ListarFilme data={item}/>
      ),[])
 
      useEffect(() => {
         getFilmes()
-
-    return () => {
-
-    }
-    },[cont])
+    // return () => {
+        
+    // }
+    },[cont, response])
     
     return (
         <View style={styles.container}>
@@ -65,7 +114,7 @@ export default function SearchFilme(){
                                 <View style={styles.viewLink}>
                                     <Text style={styles.link}>Filmes</Text>
                                     <TouchableOpacity style={styles.bntSelect} >
-                                        <Text style={styles.link}>Todos os gêneros</Text>
+                                        <Text onPress={() => setVisibleModal(true)} style={styles.link}>{response.titulo}</Text>
                                         <Down name="md-caret-down-sharp" size={14} color={"#FFF"} />
                                     </TouchableOpacity>
                                 </View>
@@ -124,6 +173,10 @@ export default function SearchFilme(){
                     numColumns={3}
                 />
             </View>
+
+            <Modal visible={visibleModal} transparent={true} onRequestClose={() => setVisibleModal(false)} animationType='fade'>
+                <ModalFilmes data={categorias} onClose={() => setVisibleModal(false)} getResponse={getResponse} />
+            </Modal>
         </View>
     )
 }
