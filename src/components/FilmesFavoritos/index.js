@@ -2,7 +2,7 @@ import { memo } from "react";
 import {FlatList,View,Text, Image, TouchableOpacity, StyleSheet, ImageBackground} from "react-native";
 import { useRouter } from "expo-router";
 
- const Filmes = ({data, index, serie}) => {
+ const Filmes = ({data, index, serie, novo}) => {
     const router = useRouter();
     return(
         data.backdrop_path &&
@@ -10,7 +10,7 @@ import { useRouter } from "expo-router";
             <View>
                 <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${data.poster_path}` }} style={styles.img}>
                 { index !== undefined && <Text style={styles.textTop5} >{index}</Text>}
-                {serie && 
+                {novo  && 
                 <View style={styles.viewEpisodio}>
                     <Text style={styles.textEpisodio}>NOVOS EPISODIOS</Text>
                 </View>}

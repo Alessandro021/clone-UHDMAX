@@ -19,6 +19,7 @@ export default function VerSerie() {
     const [numTemporada, setNumTemporada] = useState(null)
     const [visibleModal, setVisibleModal] = useState(false)
 
+    //https://api.themoviedb.org /3/tv/ {series_id} /videos
     async function getSerie() {
         let category = []
 

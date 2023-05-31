@@ -35,12 +35,12 @@ export default function Person(){
     
         setFilmes(data.cast)
         setCapa(data.cast[Math.floor(Math.random() * 20)])
-        // console.log(data.cast[0])
+        // console.log(data.cast)
     
      }
 
      const  renderItem = useCallback(({item}) => (
-        <ListarFilme data={item} />
+        <ListarFilme data={item} date={true} />
      ),[])
    
     useEffect(() => {

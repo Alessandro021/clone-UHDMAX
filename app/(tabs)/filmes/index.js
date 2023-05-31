@@ -11,7 +11,7 @@ import Logo from "../../../src/assets/icon.png"
 import { api } from "../../../src/server/api";
 
 import ListarFilme from "../../../src/components/ListarFilme";
-import ModalFilmes from "../../../src/components/ModalFilmes";
+import ModalFilmes from "../../../src/components/ModalFilmesOuSeries";
 
 export default function SearchFilme(){
     const {top} = useSafeAreaInsets();
@@ -23,10 +23,10 @@ export default function SearchFilme(){
     const [response, setResponse] = useState({titulo: "Todos os gêneros", link: "movie/now_playing"})
 
     const categorias = [
-        {id: "1", name: "Todos os gêneros", link: "movie/now_playing" },
+        {id: "1", name: "Todos os gêneros", link: "/movie/popular" },
         {id: "2", name: "Lançamentos", link: "movie/now_playing" },
-        {id: "3", name: "Novidades", link: "movie/now_playing" },
-        {id: "4", name: "Mais acessados", link: "movie/now_playing" },
+        {id: "3", name: "Novidades", link: "/movie/upcoming" },
+        {id: "4", name: "Mais acessados", link: "/movie/top_rated" },
         {id: "5", name: "Ação", link: "/discover/movie?with_genres=28" },
         {id: "6", name: "Aventura", link: "/discover/movie?with_genres=12" },
         {id: "7", name: "Animação", link: "/discover/movie?with_genres=16" },
@@ -68,6 +68,7 @@ export default function SearchFilme(){
             params:{
                 api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
                 language: "pt-BR",
+                region: 'BR',
                 page: cont,
             }
         })
@@ -84,7 +85,7 @@ export default function SearchFilme(){
      }
 
      const  renderItem = useCallback(({item}) => (
-        <ListarFilme data={item}/>
+        <ListarFilme data={item} date={false}/>
      ),[])
 
      useEffect(() => {
@@ -211,6 +212,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         gap: 50,
         justifyContent: "flex-start",
+        alignItems: "center",
     },
     
     logo: {
@@ -226,7 +228,8 @@ const styles = StyleSheet.create({
         gap: 8,
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        padding: 10,
     },
 
     /*STYLE DAS INFORMAÇOES DENTRO DO IMAGEBACKGROUND */

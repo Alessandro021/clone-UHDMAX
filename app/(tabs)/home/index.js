@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Image, StatusBar, ImageBackground, ScrollView, TouchableOpacity, tou, FlatList} from "react-native";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { View, Text, StyleSheet, Image, StatusBar, ImageBackground, ScrollView, TouchableOpacity, tou, FlatList, ActivityIndicator} from "react-native";
 import { Link , useRouter} from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Play  from '@expo/vector-icons/Ionicons';
@@ -11,25 +12,51 @@ import {LinearGradient} from 'expo-linear-gradient'
 // import ImageFundo from "../../src/assets/filme.jpg"
 import Logo from "../../../src/assets/icon.png"
 import { api } from "../../../src/server/api";
-import { useCallback, useEffect, useLayoutEffect, useState } from "react";
-// import { SafeAreaView } from "react-native-safe-area-context";
+import LoaderPlacerolder from "../../../src/components/LoaderSkeleton/loader";
 
 
-
-export default function Home(){
+export default function Home(){ 
 const {top} = useSafeAreaInsets();
 const router = useRouter();
 
 
-const [filmes, setFilmes] = useState([])
-const [Series, setSeries] = useState([])
-const [ person, setPerson] = useState([])
-const [filmePopular, setFilmePopular] = useState([])
+const [filmesLancamentos, setFilmesLancamentos] = useState([])
+const [series, setSeries] = useState([])
+const [novasSeries, setNovasSeries] = useState([])
+const [person, setPerson] = useState([])
+const [novosFilmes, setNovosFilmes] = useState([])
 const [top5, setTop5] = useState([])
 const [capa, setCapa] = useState([])
+const [loader, setLoader] = useState(true)
 
- async function getFilmes(){
+ async function getFilmesLancamentos(){
+    await api.get("movie/now_playing", {
+        params:{
+            api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
+            language: "pt-BR",
+            page: 1,
+        }
+    }).then((response) => {
+        setFilmesLancamentos(response.data.results)
+        setCapa(response.data.results[Math.floor(Math.random() * 20)])
+        setLoader(false)
+    })
+ }
+
+ async function getTopCinco(){
     const {data} = await api.get("movie/now_playing", {
+        params:{
+            api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
+            language: "pt-BR",
+            region: 'BR',
+            page: 1,
+        }
+    })
+
+    setTop5(data.results.slice(0,5))
+ }
+ async function getNovosFilmes(){
+    const {data} = await api.get("movie/upcoming", {
         params:{
             api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
             language: "pt-BR",
@@ -37,10 +64,8 @@ const [capa, setCapa] = useState([])
         }
     })
 
-    setFilmes(data.results.sort(() => Math.random() - 0.5))
-    setTop5(data.results.slice(10,15))
-    setCapa(data.results[3])
- }
+    setNovosFilmes(data.results)
+ } 
  async function getSeries(){
     const {data} = await api.get("/tv/top_rated", {
         params:{
@@ -55,53 +80,65 @@ const [capa, setCapa] = useState([])
 
     setSeries(data.results)
 
- }   
- 
+ }
+
+ async function getNovasSeries(){
+    const {data} = await api.get("/tv/on_the_air", {
+        params:{
+            api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
+            language: "pt-BR",
+            sort_by: 'popularity.desc',
+            region: 'BR',
+            // with_original_language: 'pt',
+            page: 1,
+        }
+    })
+
+    setNovasSeries(data.results)
+
+ }
  async function getPerson(){
     const {data} = await api.get("person/popular", {
         params:{
             api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
             language: "pt-BR",
+            region: 'BR',
             page: 1,
         }
     })
     // console.log(data.results)
     setPerson(data.results)
  } 
- async function getFilmePopular(){
-    const {data} = await api.get("movie/popular", {
-        params:{
-            api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
-            language: "pt-BR",
-            page: 1,
-        }
-    })
 
-    setFilmePopular(data.results)
- } 
 
 
  const  renderItemTop5 = useCallback(({item, index}) => (
     <Filmes data={item} index={index + 1}/>
  ),[])
 
- const  renderItemFilmesPopular = useCallback(({item}) => (
+ const  renderItemNovasSeries = useCallback(({item, index}) => (
+    <Filmes data={item} serie={true} />
+ ),[])
+
+ const  renderItemNovosFilmes = useCallback(({item}) => (
     <Filmes data={item}/>
  ),[])
 
- const  renderItemFilmes = useCallback(({item}) => (
+ const  renderItemFilmesLancamentos = useCallback(({item}) => (
     <Filmes data={item}/>
  ),[])
  const  renderItemSeries = useCallback(({item}) => (
-    <Filmes data={item} serie={true} />
+    <Filmes data={item} serie={true} novo={true}/>
  ),[])
 
 
     useLayoutEffect(() => {
-        getFilmes()
+        getFilmesLancamentos()
         getPerson()
+        getTopCinco()
         getSeries()
-        getFilmePopular()
+        getNovasSeries()
+        getNovosFilmes()
 
     return () => {
 
@@ -109,135 +146,154 @@ const [capa, setCapa] = useState([])
     },[])
 
     return (
-        <ScrollView style={styles.container}>
+        <View style={styles.container}>
             <StatusBar barStyle="light-content" translucent={true}/>
 
-            <ImageBackground resizeMode="cover" source={{uri: `https://image.tmdb.org/t/p/original${capa.poster_path}`}} style={styles.backgroundImage}>
-                {/*HEADER */}
-                <LinearGradient
-                    style={styles.gradient}
-                    colors={['rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.30)', 'rgba(0,0,0,1)']}
-                />
-                <View style={[styles.header, {marginTop: top}]}>
-                    <View style={styles.viewLogo}>
-                        <Image source={Logo} style={styles.logo} />
-                    </View>
-                    
-                    <View style={styles.viewLink}>
-                        <Link href="/filmes" ><Text style={styles.link}>Filmes</Text></Link>
-                        <Link href="/series" ><Text style={styles.link}>Series</Text></Link>
-                        <Link href="/canais" ><Text style={styles.link}>Canais de TV</Text></Link>
-                    </View>
-                </View>
-                
-                {/*INFORMAÇOES DENTRO DA IMAGEBACKGROUD */}
-                <View style={styles.content}>
-                    <View style={styles.viewLogoContent}>
-                        <Image source={Logo} style={styles.logoContent} />
-                        <Text style={styles.textLogo}>Filme</Text>
+        
+            {loader ? (
+            <ActivityIndicator
+                size="large"
+                color="#0000ff"
+                style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    }}
+            />
+            // <LoaderPlacerolder />
+            ) : (
+
+            <ScrollView>
+                <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${capa.poster_path}` }} style={styles.backgroundImage}>
+                    {/*HEADER */}
+                    <LinearGradient
+                        style={styles.gradient}
+                        colors={['rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.30)', 'rgba(0,0,0,1)']}
+                    />
+                    <View style={[styles.header, { marginTop: top }]}>
+                        <View style={styles.viewLogo}>
+                            <Image source={Logo} style={styles.logo} />
+                        </View>
+
+                        <View style={styles.viewLink}>
+                            <Link href="/filmes" ><Text style={styles.link}>Filmes</Text></Link>
+                            <Link href="/series" ><Text style={styles.link}>Series</Text></Link>
+                            <Link href="/canais" ><Text style={styles.link}>Canais de TV</Text></Link>
+                        </View>
                     </View>
 
-                    <Text style={styles.textFilme}>{capa.title}</Text>
+                    {/*INFORMAÇOES DENTRO DA IMAGEBACKGROUD */}
+                    <View style={styles.content}>
+                        <View style={styles.viewLogoContent}>
+                            <Image source={Logo} style={styles.logoContent} />
+                            <Text style={styles.textLogo}>Filme</Text>
+                        </View>
 
-                    <View style={styles.viewTop}>
-                        <View style={styles.viewIconTop}><Text style={styles.textIconTop}>TOP</Text></View>
-                        <Text style={styles.textTopFilme}>Top 1 Filmes Semanais</Text>
-                    </View>
+                        <Text style={styles.textFilme}>{capa.title}</Text>
 
-                    <View style={styles.viewInfo}>
-                        <TouchableOpacity style={styles.bntTrailer} activeOpacity={0.9}>
-                            <View style={styles.iconContainer}>
-                                <Play style={styles.iconTrailer} name="play" size={30} color={"#FFFFFF"} />
+                        <View style={styles.viewTop}>
+                            <View style={styles.viewIconTop}><Text style={styles.textIconTop}>TOP</Text></View>
+                            <Text style={styles.textTopFilme}>Top 1 Filmes Semanais</Text>
+                        </View>
+
+                        <View style={styles.viewInfo}>
+                            <TouchableOpacity style={styles.bntTrailer} activeOpacity={0.9}>
+                                <View style={styles.iconContainer}>
+                                    <Play style={styles.iconTrailer} name="play" size={30} color={"#FFFFFF"} />
+                                </View>
+                                <Text style={styles.textTrailer}>Ver Trailer</Text>
+                            </TouchableOpacity>
+
+                            <View style={styles.viewAssistir}>
+                                <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: { id: capa.id } })} style={styles.bntAssistir} activeOpacity={0.9}>
+                                    <Play name="play" size={30} color={"#000"} />
+                                    <Text style={styles.textAssistir}>Assistir</Text>
+                                </TouchableOpacity>
                             </View>
-                            <Text style={styles.textTrailer}>Ver Trailer</Text>
-                        </TouchableOpacity>
 
-                        <View style={styles.viewAssistir}>
-                            <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: {id: capa.id }})} style={styles.bntAssistir} activeOpacity={0.9}>
-                                <Play name="play" size={30} color={"#000"} />
-                                <Text style={styles.textAssistir}>Assistir</Text>
+                            <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: { id: capa.id } })} style={styles.bntTrailer} activeOpacity={0.9}>
+                                <View style={styles.iconContainer}>
+                                    <Info style={styles.iconTrailer} name="information-outline" size={25} color={"#FFFFFF"} />
+                                </View>
+                                <Text style={styles.textTrailer}>Saiba Mais</Text>
                             </TouchableOpacity>
                         </View>
-                        
-                        <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: {id: capa.id }})} style={styles.bntTrailer} activeOpacity={0.9}>
-                            <View style={styles.iconContainer}>
-                                <Info style={styles.iconTrailer} name="information-outline" size={25} color={"#FFFFFF"} />
-                            </View>
-                            <Text style={styles.textTrailer}>Saiba Mais</Text>
-                        </TouchableOpacity>
+
                     </View>
+                </ImageBackground>
 
+                <View style={styles.ViewCardsFilmes} >
+                    <Text style={styles.TituloCards}>Series atualizadas</Text>
+                    <FlatList
+                        data={series}
+                        keyExtractor={(item) => item.id.toString()}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={renderItemSeries}
+                    />
                 </View>
-            </ImageBackground>
 
-            {/*HEADER */}
+                <View style={styles.ViewCardsFilmes} >
+                    <Text style={styles.TituloCards}>Top 5 de hoje no Brasil</Text>
+                    <FlatList
+                        data={top5}
+                        keyExtractor={(item) => item.id.toString()}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={renderItemTop5}
+                    />
+                </View>
 
-            {/* <View style={styles.ViewCardsFilmes} >
-                <Text style={styles.TituloCards}>Filmes Novos</Text>
-                <Filmes data={filmes} />
-            </View> */}
-            <View style={styles.ViewCardsFilmes} >
-                <Text style={styles.TituloCards}>Series atualizadas</Text>
-                <FlatList
-                    data={Series}
-                    keyExtractor={(item) => item.id.toString()}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={renderItemSeries}
-                />
-            </View>
 
-            <View style={styles.ViewCardsFilmes} >
-                <Text style={styles.TituloCards}>Top 5 de hoje no Brasil</Text>
-                <FlatList
-                    data={top5}
-                    keyExtractor={(item) => item.id.toString()}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={renderItemTop5}
-                />
-            </View>
-            
+                <View style={styles.ViewCardsFilmes} >
+                    <Text style={styles.TituloCards}>Lançamentos</Text>
+                    <FlatList
+                        data={filmesLancamentos}
+                        keyExtractor={(item) => item.id.toString()}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={renderItemFilmesLancamentos}
+                    />
+                </View>
 
-            <View style={styles.ViewCardsFilmes} >
-                <Text style={styles.TituloCards}>Filmes Novos</Text>
-                <FlatList
-                    data={filmes}
-                    keyExtractor={(item) => item.id.toString()}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={renderItemFilmes}
-                />
-            </View>
+                <View style={styles.ViewCardsFilmes} >
+                    <Text style={styles.TituloCards}>Novos filmes</Text>
+                    <FlatList
+                        data={novosFilmes}
+                        keyExtractor={(item) => item.id.toString()}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={renderItemNovosFilmes}
+                    />
+                </View>
 
-            <View style={styles.ViewCardsFilmes} >
-                <Text style={styles.TituloCards}>Filmes Populares</Text>
-                <FlatList
-                    data={filmePopular}
-                    keyExtractor={(item) => item.id.toString()}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={renderItemFilmesPopular}
-                />
-            </View>
+                <View style={styles.ViewCardsFilmes} >
+                    <Text style={styles.TituloCards}>Novas series</Text>
+                    <FlatList
+                        data={novasSeries}
+                        keyExtractor={(item) => item.id.toString()}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={renderItemNovasSeries}
+                    />
+                </View>
 
-            <View style={[styles.ViewCardsFilmes, {marginBottom: 50}]} >
-                <Text style={styles.TituloCards}>Atores Populares</Text>
-                <FlatList
-                    data={person}
-                    keyExtractor={(item) => item.id.toString()}
-                    horizontal={true}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({item}) => <Person data={item} /> }
-                />
-            </View>
+                <View style={[styles.ViewCardsFilmes, { marginBottom: 50 }]} >
+                    <Text style={styles.TituloCards}>Atores Populares</Text>
+                    <FlatList
+                        data={person}
+                        keyExtractor={(item) => item.id.toString()}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={({ item }) => <Person data={item} />}
+                    />
+                </View>
 
-            {/* <View>
-                <Image resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${person.profile_path}`}} style={styles.img}/>
+            </ScrollView>
 
-            </View> */}
-
-        </ScrollView>
+            )}
+        
+        </View>
     )
 }
 

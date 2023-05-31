@@ -1,22 +1,21 @@
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, StatusBar} from "react-native";
 import Close from '@expo/vector-icons/AntDesign';
 
-export default function ModalFilmes({data, onClose, getResponse}){
+export default function ModalFilmesOuSeries({data, onClose, getResponse}){
 
     function closeModal(){
         onClose()
     }
     return(
         <View style={styles.container}>
+            <StatusBar backgroundColor={"#000000"} />
             <ScrollView showsHorizontalScrollIndicator={false} style={styles.content}>
                 {data?.map((item, index) => {
-                    if (index !== 0 || data.length <= 2) {
                         return (
                             <TouchableOpacity style={styles.bntTemporada} key={index} onPress={() => {closeModal(), getResponse({titulo: item.name, link: item.link})}} >
                                 <Text style={styles.textTemporada}>{item.name}</Text>
                             </TouchableOpacity>
                         )
-                    }
                 })}
             </ScrollView>
 

@@ -12,7 +12,7 @@ import Logo from "../../../src/assets/icon.png"
 import { api } from "../../../src/server/api";
 
 import ListarFilme from "../../../src/components/ListarFilme";
-import ModalFilmes from "../../../src/components/ModalFilmes";
+import ModalSeries from "../../../src/components/ModalFilmesOuSeries";
 
 export default function SearchSerie(){
     const {top} = useSafeAreaInsets();
@@ -20,21 +20,47 @@ export default function SearchSerie(){
     const [series, setSeries] = useState([])
     const [capa, setCapa] = useState([])
     const [cont, setCont] = useState(1)
+    const [visibleModal, setVisibleModal] = useState(false)
+    const [response, setResponse] = useState({titulo: "Todos os gêneros", link: "/tv/popular"})
 
-
+    const categorias = [
+        {id: "1", name: "Todos os gêneros", link: "/tv/popular" },
+        {id: "2", name: "Mais acessadas", link: "/tv/popular" },
+        {id: "3", name: "Melhor classificação", link: `/discover/tv?sort_by=vote_average.desc` },
+        {id: "4", name: "Novos epsódios", link: `/discover/tv?first_air_date.gte=${new Date().toISOString().split('T')[0]}`},
+        {id: "5", name: "Kids", link: "/discover/tv?with_genres=16, 10751" },
+        {id: "6", name: "Animes", link: "/search/tv?query=anime&with_genres=16" },
+        {id: "7", name: "Netflix", link: "/tv/top_rated" },
+        // {id: "8", name: "Recentes", link:"/tv/latest"},
+    ]
 
     async function getSeries(){
        
-        const {data} = await api.get("/tv/top_rated", {
+        const {data} = await api.get(`${response.link}`, {
             params:{
                 api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
                 language: "pt-BR",
+                region: 'BR',
                 page: cont,
             }
         })
-    
-        setSeries(cont === 1 ? data.results :  series.concat(data.results) )
-        setCapa(data.results[Math.floor(Math.random() * 20)])
+
+        if(response.titulo === "Mais acessadas"){
+            let seriesMaisAcessadas = data.results
+            seriesMaisAcessadas.sort((a, b) => b.popularity - a.popularity);
+            setSeries(cont === 1 ? seriesMaisAcessadas :  series.concat(seriesMaisAcessadas) )
+            setCapa(seriesMaisAcessadas[Math.floor(Math.random() * 20)])
+        } else {
+            setSeries(cont === 1 ? data.results :  series.concat(data.results) )
+            setCapa(data.results[Math.floor(Math.random() * 20)])
+     }
+        }
+
+     function getResponse(response){
+        if(response.link !== undefined){
+            setResponse(response)
+            setCont(1)
+        }
      }
 
      const  renderItem = useCallback(({item}) => (
@@ -44,7 +70,7 @@ export default function SearchSerie(){
 
      useEffect(() => {
         getSeries()
-    },[cont])
+    },[cont, response])
     
     return ( 
         <View style={styles.container}>
@@ -65,8 +91,8 @@ export default function SearchSerie(){
 
                                 <View style={styles.viewLink}>
                                     <Text style={styles.link}>Series</Text>
-                                    <TouchableOpacity style={styles.bntSelect} >
-                                        <Text style={styles.link}>Todos os gêneros</Text>
+                                    <TouchableOpacity onPress={() => setVisibleModal(true)} style={styles.bntSelect} >
+                                        <Text style={styles.link}>{response.titulo}</Text>
                                         <Down name="md-caret-down-sharp" size={14} color={"#FFF"} />
                                     </TouchableOpacity>
                                 </View>
@@ -124,6 +150,9 @@ export default function SearchSerie(){
                     numColumns={3}
                 />
             </View>
+            <Modal visible={visibleModal} transparent={true} onRequestClose={() => setVisibleModal(false)} animationType='fade'>
+                <ModalSeries data={categorias} onClose={() => setVisibleModal(false)} getResponse={getResponse} />
+            </Modal>
         </View>
     )
 }
@@ -156,6 +185,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         gap: 50,
         justifyContent: "flex-start",
+        alignItems: "center",
     },
     
     logo: {
@@ -171,7 +201,8 @@ const styles = StyleSheet.create({
         gap: 8,
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        padding: 10,
     },
 
     /*STYLE DAS INFORMAÇOES DENTRO DO IMAGEBACKGROUND */

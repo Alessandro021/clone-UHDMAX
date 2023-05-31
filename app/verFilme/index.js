@@ -28,6 +28,16 @@ export default function VerFilme(){
         category =  data.genres.map(item => (item.name))
         setCateg(category.join(', '))
     }
+    async function trailerFilme() {
+        const { data } = await api.get(`/movie/${id}/videos`, {
+            params: {
+                api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
+                language: "pt-BR",
+            }
+
+        })
+        console.log(data)
+    }
 
     function categoria(){
         let categoria = []
