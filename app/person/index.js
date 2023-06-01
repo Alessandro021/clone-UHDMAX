@@ -13,6 +13,7 @@ import Voltar  from '@expo/vector-icons/Ionicons';
 
 import Logo from "../../src/assets/icon.png"
 import ListarFilme from "../../src/components/ListarFilme";
+import LoaderPlacerolder from "../../src/components/LoaderSkeleton/loader";
 
 
 
@@ -23,20 +24,22 @@ export default function Person(){
 
     const [filmes, setFilmes] = useState([])
     const [capa, setCapa] = useState({})
+    const [loader, setLoader] = useState(true)
+
 
 
     async function getPerson(){
-        const {data} = await api.get(`person/${id}/movie_credits`, {
+        await api.get(`person/${id}/movie_credits`, {
             params:{
                 api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
                 language: "pt-BR",
             }
-        })
-    
-        setFilmes(data.cast)
-        setCapa(data.cast[Math.floor(Math.random() * 20)])
+        }).then(response => {
+            setFilmes(response.data.cast)
+            setCapa(response.data.cast[Math.floor(Math.random() * 20)])
+            setLoader(false)
         // console.log(data.cast)
-    
+        })
      }
 
      const  renderItem = useCallback(({item}) => (
@@ -50,74 +53,78 @@ export default function Person(){
         <View style={styles.container}>
             <Stack.Screen options={{headerShown: false  ,title: "", headerStyle: {backgroundColor: "#000"}, headerTintColor: "#FFF"}}  />
             
+            {loader ?
+            (
+                <LoaderPlacerolder />
+            ):(
+                <View style={styles.ViewCardsFilmes} >
+                    <FlatList
+                        ListHeaderComponent={
+                            <>
+                                <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${capa?.poster_path}` }} style={styles.backgroundImage}>
 
-            <View style={styles.ViewCardsFilmes} >
-                <FlatList
-                    ListHeaderComponent={
-                        <>
-                        <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${capa?.poster_path}` }} style={styles.backgroundImage}>
+                                    <LinearGradient
+                                        style={styles.gradient}
+                                        colors={['rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.30)', 'rgba(0,0,0,1)']}
+                                    />
 
-                            <LinearGradient
-                                style={styles.gradient}
-                                colors={['rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.30)', 'rgba(0,0,0,1)']}
-                            />
-
-                            <View style={[styles.header, { marginTop: top }]}>
-                                <TouchableOpacity onPress={() => router.push("/home")} style={styles.bntVoltar}>
-                                    <Voltar name="md-arrow-back-outline" size={24} color={"#FFF"} />
-                                </TouchableOpacity>
-                            </View>
-
-
-                            {/*INFORMAÇOES DENTRO DA IMAGEBACKGROUD */}
-                            <View style={styles.content}>
-                                <View style={styles.viewLogoContent}>
-                                    <Image source={Logo} style={styles.logoContent} />
-                                    <Text style={styles.textLogo}>Filme</Text>
-                                </View>
-
-                                <Text style={styles.textFilme}>{capa?.title}</Text>
-
-                                <View style={styles.viewTop}>
-                                    <View style={styles.viewIconTop}><Text style={styles.textIconTop}>TOP</Text></View>
-                                    <Text style={styles.textTopFilme}>Top 1 Filmes Semanais</Text>
-                                </View>
-
-                                <View style={styles.viewInfo}>
-                                    <TouchableOpacity style={styles.bntTrailer} activeOpacity={0.9}>
-                                        <View style={styles.iconContainer}>
-                                            <Play style={styles.iconTrailer} name="play" size={30} color={"#FFFFFF"} />
-                                        </View>
-                                        <Text style={styles.textTrailer}>Ver Trailer</Text>
-                                    </TouchableOpacity>
-
-                                    <View style={styles.viewAssistir}>
-                                        <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: { id: capa?.id } })} style={styles.bntAssistir} activeOpacity={0.9}>
-                                            <Play name="play" size={30} color={"#000"} />
-                                            <Text style={styles.textAssistir}>Assistir</Text>
+                                    <View style={[styles.header, { marginTop: top }]}>
+                                        <TouchableOpacity onPress={() => router.push("/home")} style={styles.bntVoltar}>
+                                            <Voltar name="md-arrow-back-outline" size={24} color={"#FFF"} />
                                         </TouchableOpacity>
                                     </View>
 
-                                    <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: { id: capa?.id } })} style={styles.bntTrailer} activeOpacity={0.9}>
-                                        <View style={styles.iconContainer}>
-                                            <Info style={styles.iconTrailer} name="information-outline" size={25} color={"#FFFFFF"} />
+
+                                    {/*INFORMAÇOES DENTRO DA IMAGEBACKGROUD */}
+                                    <View style={styles.content}>
+                                        <View style={styles.viewLogoContent}>
+                                            <Image source={Logo} style={styles.logoContent} />
+                                            <Text style={styles.textLogo}>Filme</Text>
                                         </View>
-                                        <Text style={styles.textTrailer}>Saiba Mais</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </ImageBackground>
-                        <Text style={styles.name}>{name}</Text>
-                        </>
-                    }
-                    data={filmes}
-                    keyExtractor={(item) => item.id.toString()}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={renderItem}
-                    numColumns={3}
+
+                                        <Text style={styles.textFilme}>{capa?.title}</Text>
+
+                                        <View style={styles.viewTop}>
+                                            <View style={styles.viewIconTop}><Text style={styles.textIconTop}>TOP</Text></View>
+                                            <Text style={styles.textTopFilme}>Top 1 Filmes Semanais</Text>
+                                        </View>
+
+                                        <View style={styles.viewInfo}>
+                                            <TouchableOpacity style={styles.bntTrailer} activeOpacity={0.9}>
+                                                <View style={styles.iconContainer}>
+                                                    <Play style={styles.iconTrailer} name="play" size={30} color={"#FFFFFF"} />
+                                                </View>
+                                                <Text style={styles.textTrailer}>Ver Trailer</Text>
+                                            </TouchableOpacity>
+
+                                            <View style={styles.viewAssistir}>
+                                                <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: { id: capa?.id } })} style={styles.bntAssistir} activeOpacity={0.9}>
+                                                    <Play name="play" size={30} color={"#000"} />
+                                                    <Text style={styles.textAssistir}>Assistir</Text>
+                                                </TouchableOpacity>
+                                            </View>
+
+                                            <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: { id: capa?.id } })} style={styles.bntTrailer} activeOpacity={0.9}>
+                                                <View style={styles.iconContainer}>
+                                                    <Info style={styles.iconTrailer} name="information-outline" size={25} color={"#FFFFFF"} />
+                                                </View>
+                                                <Text style={styles.textTrailer}>Saiba Mais</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </ImageBackground>
+                                <Text style={styles.name}>{name}</Text>
+                            </>
+                        }
+                        data={filmes}
+                        keyExtractor={(item) => item.id.toString()}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={renderItem}
+                        numColumns={3}
                     // columnWrapperStyle={styles.listarFilme}
-                />
-            </View>
+                    />
+                </View>
+            )}
             
         </View>
     )

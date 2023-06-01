@@ -13,6 +13,7 @@ import { api } from "../../../src/server/api";
 
 import ListarFilme from "../../../src/components/ListarFilme";
 import ModalSeries from "../../../src/components/ModalFilmesOuSeries";
+import LoaderPlacerolder from "../../../src/components/LoaderSkeleton/loader";
 
 export default function SearchSerie(){
     const {top} = useSafeAreaInsets();
@@ -22,6 +23,7 @@ export default function SearchSerie(){
     const [cont, setCont] = useState(1)
     const [visibleModal, setVisibleModal] = useState(false)
     const [response, setResponse] = useState({titulo: "Todos os gêneros", link: "/tv/popular"})
+    const [loader, setLoader] = useState(true)
 
     const categorias = [
         {id: "1", name: "Todos os gêneros", link: "/tv/popular" },
@@ -35,28 +37,31 @@ export default function SearchSerie(){
     ]
 
     async function getSeries(){
-       
-        const {data} = await api.get(`${response.link}`, {
+    await api.get(`${response.link}`, {
             params:{
                 api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
                 language: "pt-BR",
                 region: 'BR',
                 page: cont,
             }
+        }).then(resposta => {
+            if(response.titulo === "Mais acessadas"){
+                let seriesMaisAcessadas = resposta.data.results
+                seriesMaisAcessadas.sort((a, b) => b.popularity - a.popularity);
+                setSeries(cont === 1 ? seriesMaisAcessadas :  series.concat(seriesMaisAcessadas) )
+                setCapa(seriesMaisAcessadas[Math.floor(Math.random() * 20)])
+                setLoader(false)
+    
+            } else {
+                setSeries(cont === 1 ? resposta.data.results :  series.concat(resposta.data.results) )
+                setCapa(resposta.data.results[Math.floor(Math.random() * 20)])
+                setLoader(false)
+         }
         })
 
-        if(response.titulo === "Mais acessadas"){
-            let seriesMaisAcessadas = data.results
-            seriesMaisAcessadas.sort((a, b) => b.popularity - a.popularity);
-            setSeries(cont === 1 ? seriesMaisAcessadas :  series.concat(seriesMaisAcessadas) )
-            setCapa(seriesMaisAcessadas[Math.floor(Math.random() * 20)])
-        } else {
-            setSeries(cont === 1 ? data.results :  series.concat(data.results) )
-            setCapa(data.results[Math.floor(Math.random() * 20)])
-     }
-        }
+    }
 
-     function getResponse(response){
+    function getResponse(response){
         if(response.link !== undefined){
             setResponse(response)
             setCont(1)
@@ -74,15 +79,19 @@ export default function SearchSerie(){
     
     return ( 
         <View style={styles.container}>
-             
+            
+            {loader ? 
+            (
+             <LoaderPlacerolder />       
+            ): (
             <View style={styles.ViewCardsSeries} >
                 <FlatList
-                ListHeaderComponent={
+                    ListHeaderComponent={
                         <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${capa?.poster_path}` }} style={styles.backgroundImage}>
                             {/*HEADER */}
                             <LinearGradient
                                 style={styles.gradient}
-                                colors={[ 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)','rgba(0,0,0,0.30)', 'rgba(0,0,0,1)']}
+                                colors={['rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.30)', 'rgba(0,0,0,1)']}
                             />
                             <View style={[styles.header, { marginTop: top }]}>
                                 <View style={styles.viewLogo}>
@@ -137,11 +146,11 @@ export default function SearchSerie(){
 
                             </View>
                         </ImageBackground>
-                }
+                    }
                     ListFooterComponent={
-                    <TouchableOpacity onPress={() => getSeries(setCont(cont+1))} style={styles.bntMais}>
-                        <Text style={styles.textMais}>Carregar mais...</Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity onPress={() => getSeries(setCont(cont + 1))} style={styles.bntMais}>
+                            <Text style={styles.textMais}>Carregar mais...</Text>
+                        </TouchableOpacity>
                     }
                     data={series}
                     keyExtractor={(item) => item.id?.toString()}
@@ -150,6 +159,8 @@ export default function SearchSerie(){
                     numColumns={3}
                 />
             </View>
+            )}
+            
             <Modal visible={visibleModal} transparent={true} onRequestClose={() => setVisibleModal(false)} animationType='fade'>
                 <ModalSeries data={categorias} onClose={() => setVisibleModal(false)} getResponse={getResponse} />
             </Modal>

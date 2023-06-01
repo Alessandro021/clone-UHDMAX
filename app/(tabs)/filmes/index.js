@@ -12,6 +12,7 @@ import { api } from "../../../src/server/api";
 
 import ListarFilme from "../../../src/components/ListarFilme";
 import ModalFilmes from "../../../src/components/ModalFilmesOuSeries";
+import LoaderPlacerolder from "../../../src/components/LoaderSkeleton/loader";
 
 export default function SearchFilme(){
     const {top} = useSafeAreaInsets();
@@ -21,6 +22,7 @@ export default function SearchFilme(){
     const [cont, setCont] = useState(1)
     const [visibleModal, setVisibleModal] = useState(false)
     const [response, setResponse] = useState({titulo: "Todos os gêneros", link: "movie/now_playing"})
+    const [loader, setLoader] = useState(true)
 
     const categorias = [
         {id: "1", name: "Todos os gêneros", link: "/movie/popular" },
@@ -64,17 +66,18 @@ export default function SearchFilme(){
 
 
     async function getFilmes(){
-        const {data} = await api.get(`${response.link}`, {
+        await api.get(`${response.link}`, {
             params:{
                 api_key: "2f80d2c6cee2d978397b2ef6c5ba08a0",
                 language: "pt-BR",
                 region: 'BR',
                 page: cont,
             }
+        }).then(response => {
+            setFilmes(cont === 1 ? response.data.results :  filmes.concat(response.data.results) )
+            setCapa(response.data.results[Math.floor(Math.random() * 20)])
+            setLoader(false)
         })
-    
-        setFilmes(cont === 1 ? data.results :  filmes.concat(data.results) )
-        setCapa(data.results[Math.floor(Math.random() * 20)])
      }
 
      function getResponse(response){
@@ -98,82 +101,88 @@ export default function SearchFilme(){
     return (
         <View style={styles.container}>
              
-            <View style={styles.ViewCardsFilmes} >
-                <FlatList
-                ListHeaderComponent={
-                        <ImageBackground  resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${capa?.poster_path}` }} style={styles.backgroundImage}>
-                            {/*HEADER */}
-                            <LinearGradient
-                                style={styles.gradient}
-                                colors={[ 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)','rgba(0,0,0,0.30)', 'rgba(0,0,0,1)']}
-                            />
-                            <View style={[styles.header, { marginTop: top }]}>
-                                <View style={styles.viewLogo}>
-                                    <Image source={Logo} style={styles.logo} />
+             {loader ?
+             (
+                <LoaderPlacerolder />
+             ):(
+                <View style={styles.ViewCardsFilmes} >
+                    <FlatList
+                        ListHeaderComponent={
+                            <ImageBackground resizeMode="cover" source={{ uri: `https://image.tmdb.org/t/p/original${capa?.poster_path}` }} style={styles.backgroundImage}>
+                                {/*HEADER */}
+                                <LinearGradient
+                                    style={styles.gradient}
+                                    colors={['rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.20)', 'rgba(0,0,0,0.30)', 'rgba(0,0,0,1)']}
+                                />
+                                <View style={[styles.header, { marginTop: top }]}>
+                                    <View style={styles.viewLogo}>
+                                        <Image source={Logo} style={styles.logo} />
+                                    </View>
+
+                                    <View style={styles.viewLink}>
+                                        <Text style={styles.link}>Filmes</Text>
+                                        <TouchableOpacity style={styles.bntSelect} >
+                                            <Text onPress={() => setVisibleModal(true)} style={styles.link}>{response.titulo}</Text>
+                                            <Down name="md-caret-down-sharp" size={14} color={"#FFF"} />
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
 
-                                <View style={styles.viewLink}>
-                                    <Text style={styles.link}>Filmes</Text>
-                                    <TouchableOpacity style={styles.bntSelect} >
-                                        <Text onPress={() => setVisibleModal(true)} style={styles.link}>{response.titulo}</Text>
-                                        <Down name="md-caret-down-sharp" size={14} color={"#FFF"} />
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
+                                {/*INFORMAÇOES DENTRO DA IMAGEBACKGROUD */}
+                                <View style={styles.content}>
+                                    <View style={styles.viewLogoContent}>
+                                        <Image source={Logo} style={styles.logoContent} />
+                                        <Text style={styles.textLogo}>Filme</Text>
+                                    </View>
 
-                            {/*INFORMAÇOES DENTRO DA IMAGEBACKGROUD */}
-                            <View style={styles.content}>
-                                <View style={styles.viewLogoContent}>
-                                    <Image source={Logo} style={styles.logoContent} />
-                                    <Text style={styles.textLogo}>Filme</Text>
-                                </View>
+                                    <Text style={styles.textFilme}>{capa.title}</Text>
 
-                                <Text style={styles.textFilme}>{capa.title}</Text>
+                                    <View style={styles.viewTop}>
+                                        <View style={styles.viewIconTop}><Text style={styles.textIconTop}>TOP</Text></View>
+                                        <Text style={styles.textTopFilme}>Top 1 Filmes Semanais</Text>
+                                    </View>
 
-                                <View style={styles.viewTop}>
-                                    <View style={styles.viewIconTop}><Text style={styles.textIconTop}>TOP</Text></View>
-                                    <Text style={styles.textTopFilme}>Top 1 Filmes Semanais</Text>
-                                </View>
+                                    <View style={styles.viewInfo}>
+                                        <TouchableOpacity style={styles.bntTrailer} activeOpacity={0.9}>
+                                            <View style={styles.iconContainer}>
+                                                <Play style={styles.iconTrailer} name="play" size={30} color={"#FFFFFF"} />
+                                            </View>
+                                            <Text style={styles.textTrailer}>Ver Trailer</Text>
+                                        </TouchableOpacity>
 
-                                <View style={styles.viewInfo}>
-                                    <TouchableOpacity style={styles.bntTrailer} activeOpacity={0.9}>
-                                        <View style={styles.iconContainer}>
-                                            <Play style={styles.iconTrailer} name="play" size={30} color={"#FFFFFF"} />
+                                        <View style={styles.viewAssistir}>
+                                            <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: { id: capa.id } })} style={styles.bntAssistir} activeOpacity={0.9}>
+                                                <Play name="play" size={30} color={"#000"} />
+                                                <Text style={styles.textAssistir}>Assistir</Text>
+                                            </TouchableOpacity>
                                         </View>
-                                        <Text style={styles.textTrailer}>Ver Trailer</Text>
-                                    </TouchableOpacity>
 
-                                    <View style={styles.viewAssistir}>
-                                        <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: { id: capa.id } })} style={styles.bntAssistir} activeOpacity={0.9}>
-                                            <Play name="play" size={30} color={"#000"} />
-                                            <Text style={styles.textAssistir}>Assistir</Text>
+                                        <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: { id: capa.id } })} style={styles.bntTrailer} activeOpacity={0.9}>
+                                            <View style={styles.iconContainer}>
+                                                <Info style={styles.iconTrailer} name="information-outline" size={25} color={"#FFFFFF"} />
+                                            </View>
+                                            <Text style={styles.textTrailer}>Saiba Mais</Text>
                                         </TouchableOpacity>
                                     </View>
 
-                                    <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: { id: capa.id } })} style={styles.bntTrailer} activeOpacity={0.9}>
-                                        <View style={styles.iconContainer}>
-                                            <Info style={styles.iconTrailer} name="information-outline" size={25} color={"#FFFFFF"} />
-                                        </View>
-                                        <Text style={styles.textTrailer}>Saiba Mais</Text>
-                                    </TouchableOpacity>
                                 </View>
 
-                            </View>
-                            
-                        </ImageBackground>
-                }
-                    ListFooterComponent={
-                    <TouchableOpacity onPress={() => getFilmes(setCont(cont+1))} style={styles.bntMais}>
-                        <Text style={styles.textMais}>Carregar mais...</Text>
-                    </TouchableOpacity>
-                    }
-                    data={filmes}
-                    keyExtractor={(item) => item.id.toString()}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={renderItem}
-                    numColumns={3}
-                />
-            </View>
+                            </ImageBackground>
+                        }
+                        ListFooterComponent={
+                            <TouchableOpacity onPress={() => getFilmes(setCont(cont + 1))} style={styles.bntMais}>
+                                <Text style={styles.textMais}>Carregar mais...</Text>
+                            </TouchableOpacity>
+                        }
+                        data={filmes}
+                        keyExtractor={(item) => item.id.toString()}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={renderItem}
+                        numColumns={3}
+                    />
+                </View>
+             )}
+            
 
             <Modal visible={visibleModal} transparent={true} onRequestClose={() => setVisibleModal(false)} animationType='fade'>
                 <ModalFilmes data={categorias} onClose={() => setVisibleModal(false)} getResponse={getResponse} />

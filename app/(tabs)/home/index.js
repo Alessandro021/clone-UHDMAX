@@ -151,16 +151,16 @@ const [loader, setLoader] = useState(true)
 
         
             {loader ? (
-            <ActivityIndicator
-                size="large"
-                color="#0000ff"
-                style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    }}
-            />
-            // <LoaderPlacerolder />
+            // <ActivityIndicator
+            //     size="large"
+            //     color="#0000ff"
+            //     style={{
+            //         position: 'absolute',
+            //         top: '50%',
+            //         left: '50%',
+            //         }}
+            // />
+            <LoaderPlacerolder />
             ) : (
 
             <ScrollView>
@@ -267,7 +267,7 @@ const [loader, setLoader] = useState(true)
                     />
                 </View>
 
-                <View style={styles.ViewCardsFilmes} >
+                {/* <View style={styles.ViewCardsFilmes} >
                     <Text style={styles.TituloCards}>Novas series</Text>
                     <FlatList
                         data={novasSeries}
@@ -276,7 +276,7 @@ const [loader, setLoader] = useState(true)
                         showsHorizontalScrollIndicator={false}
                         renderItem={renderItemNovasSeries}
                     />
-                </View>
+                </View> */}
 
                 <View style={[styles.ViewCardsFilmes, { marginBottom: 50 }]} >
                     <Text style={styles.TituloCards}>Atores Populares</Text>
