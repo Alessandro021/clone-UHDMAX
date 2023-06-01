@@ -10,7 +10,7 @@ export default function ModalTemporadas({data, onClose, buscaTemporada}){
         <View style={styles.container}>
             <ScrollView showsHorizontalScrollIndicator={false} style={styles.content}>
                 {data?.map((item, index) => {
-                    if (index !== 0 || data.length <= 2) {
+                    if (item.season_number !== 0) {
                         return (
                             <TouchableOpacity style={styles.bntTemporada} key={index} onPress={() => {closeModal(), buscaTemporada(item.season_number)}} >
                                 <Text style={styles.textTemporada}>Temporada {item.season_number}</Text>

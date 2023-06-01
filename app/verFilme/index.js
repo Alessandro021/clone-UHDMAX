@@ -15,6 +15,7 @@ export default function VerFilme(){
     const [filme, setFilme] = useState({})
     const [similares, setSimilares] = useState([])
     const [categ, setCateg] = useState("")
+    const [favorito, setFavorito] = useState(false)
     const [like, setLike] = useState(false)
     const [loader, setLoader] = useState(true)
     const [playing, setPlaying] = useState(false);
@@ -120,7 +121,7 @@ export default function VerFilme(){
                         <Text style={styles.textTempo}>{filme.runtime}min.</Text>
                     </View>
 
-                    <TouchableOpacity style={styles.bntAssistir} onPress={togglePlaying} >
+                    <TouchableOpacity style={styles.bntAssistir} >
                         <Play name="play" size={30} color={"#000"} />
                         <Text style={styles.textAssistir}>Assistir</Text>
                     </TouchableOpacity>
@@ -142,11 +143,11 @@ export default function VerFilme(){
                             <Text style={styles.textAction}>Classifique</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.bntAction} activeOpacity={0.9}>
+                        <TouchableOpacity onPress={() => setFavorito(!favorito)} style={styles.bntAction} activeOpacity={0.9}>
                             <View style={styles.iconView}>
-                                <Icon name="favorite" size={30} color={"#FFFFFF"} />
+                                <Icon name="favorite" size={30} color={favorito ? "#9D1FFF" : "#FFFFFF"} />
                             </View>
-                            <Text style={styles.textAction}>Salvar favoritos</Text>
+                            <Text style={[styles.textAction, favorito ? { color: "#9D1FFF" } : { color: "#FFF" }]}>{favorito ? "Salvo" : "Salvar favoritos"}</Text>
                         </TouchableOpacity>
                     </View>
 

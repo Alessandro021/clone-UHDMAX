@@ -84,11 +84,6 @@ export default function Person(){
 
                                         <Text style={styles.textFilme}>{capa?.title}</Text>
 
-                                        <View style={styles.viewTop}>
-                                            <View style={styles.viewIconTop}><Text style={styles.textIconTop}>TOP</Text></View>
-                                            <Text style={styles.textTopFilme}>Top 1 Filmes Semanais</Text>
-                                        </View>
-
                                         <View style={styles.viewInfo}>
                                             <TouchableOpacity style={styles.bntTrailer} activeOpacity={0.9}>
                                                 <View style={styles.iconContainer}>
@@ -104,12 +99,12 @@ export default function Person(){
                                                 </TouchableOpacity>
                                             </View>
 
-                                            <TouchableOpacity onPress={() => router.push({ pathname: 'verFilme', params: { id: capa?.id } })} style={styles.bntTrailer} activeOpacity={0.9}>
-                                                <View style={styles.iconContainer}>
-                                                    <Info style={styles.iconTrailer} name="information-outline" size={25} color={"#FFFFFF"} />
+                                            <View style={styles.viewContainertRelevancia}>
+                                                <View style={styles.viewRelevancia}>
+                                                    <View style={styles.viewIconRelevancia}><Text style={styles.textIconRelevancia}>{capa.vote_average?.toFixed(1)}</Text></View>
                                                 </View>
-                                                <Text style={styles.textTrailer}>Saiba Mais</Text>
-                                            </TouchableOpacity>
+                                                <Text style={styles.textTrailer}>Relevância</Text>
+                                            </View>
                                         </View>
                                     </View>
                                 </ImageBackground>
@@ -188,26 +183,33 @@ const styles = StyleSheet.create({
         fontWeight: "900",
         textAlign: "center"
     },
-    viewTop: {
+
+    viewContainertRelevancia: {
+        flexDirection: "column",
+        justifyContent: "center",
+        gap: 5
+    },
+    viewRelevancia: {
         flexDirection: "row",
         alignContent: "center",
         justifyContent: "center",
         marginTop: 10,
         gap: 10
     },
-    viewIconTop:{
-        width: 20,
-        height: 22,
-        borderWidth: 1,
+    viewIconRelevancia:{
+        width: 30,
+        height: 30,
+        borderRadius: 20,
+        borderWidth: 1.5,
         borderColor: "#FFFFFF",
         alignContent: "center",
         justifyContent: "center"
     },
-    textIconTop: {
+    textIconRelevancia: {
         color: "#FFFFFF",
-        fontSize: 8,
+        fontSize: 10,
         textAlign: "center",
-        fontWeight: "700"
+        fontWeight: "900"
     },
     textTopFilme: {
         color: "#FFFFFF",
@@ -219,7 +221,8 @@ const styles = StyleSheet.create({
         alignContent: "center",
         justifyContent: "space-evenly",
         paddingHorizontal: 30,
-        marginTop: 20
+        marginTop: 20,
+        gap: 5
     },
     bntTrailer: {
         flexDirection: "column",
@@ -230,7 +233,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     iconTrailer: {
-        marginBottom: 5,
+        // marginBottom: 5,
     },
     textTrailer: {
         color: "#FFFFFF",

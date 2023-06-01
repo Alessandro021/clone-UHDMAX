@@ -267,7 +267,7 @@ const [loader, setLoader] = useState(true)
                     />
                 </View>
 
-                {/* <View style={styles.ViewCardsFilmes} >
+                <View style={styles.ViewCardsFilmes} >
                     <Text style={styles.TituloCards}>Novas series</Text>
                     <FlatList
                         data={novasSeries}
@@ -276,7 +276,7 @@ const [loader, setLoader] = useState(true)
                         showsHorizontalScrollIndicator={false}
                         renderItem={renderItemNovasSeries}
                     />
-                </View> */}
+                </View>
 
                 <View style={[styles.ViewCardsFilmes, { marginBottom: 50 }]} >
                     <Text style={styles.TituloCards}>Atores Populares</Text>

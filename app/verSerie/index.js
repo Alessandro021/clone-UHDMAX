@@ -23,10 +23,10 @@ export default function VerSerie() {
     const [visibleModal, setVisibleModal] = useState(false)
     const [loader, setLoader] = useState(true)
     const [like, setLike] = useState(false)
+    const [favorito, setFavorito] = useState(false)
     const [traler, setTraler] = useState(null);
     const [showTrailer, setshowTrailer] = useState(false)
     const [idTemporada, setIdTemporada] = useState(null)
-
     const [playing, setPlaying] = useState(false);
     
 
@@ -64,7 +64,7 @@ export default function VerSerie() {
         })
         setIdTemporada(data.id)
         setTemporadas(data.episodes)
-        // console.log(data.episodes)
+        // console.log(data.poster_path)
     }
 
     function buscaTemporada(valor){
@@ -107,7 +107,7 @@ export default function VerSerie() {
                 <LoaderFimesESeries />
             ):(
                 <>
-                    <ImageBackground style={styles.img} source={{ uri: `https://image.tmdb.org/t/p/original${serie.backdrop_path}` }}>
+                    <ImageBackground style={styles.img} source={{ uri: `https://image.tmdb.org/t/p/original${serie.backdrop_path }` }}>
                     {(traler && showTrailer) && 
                     <YoutubePlayer
                         height={260}
@@ -149,7 +149,8 @@ export default function VerSerie() {
                                     <Text style={styles.textTempo}>{serie.number_of_seasons} Temporadas HD</Text>
                                 </View>
 
-                                <TouchableOpacity style={styles.bntAssistir} >
+                                <TouchableOpacity style={styles.bntAssistir}
+                                 >
                                     {/* <Play name="play" size={30} color={"#000"} /> */}
                                     <Text style={styles.textAssistir}>Session {serie.number_of_seasons} Temporada(as) disponiveis</Text>
                                 </TouchableOpacity>
@@ -166,11 +167,11 @@ export default function VerSerie() {
                                         <Text style={styles.textAction}>Classifique</Text>
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity style={styles.bntAction} activeOpacity={0.9}>
+                                    <TouchableOpacity onPress={() =>setFavorito(!favorito)} style={styles.bntAction} activeOpacity={0.9}>
                                         <View style={styles.iconView}>
-                                            <Icon name="favorite" size={30} color={"#FFFFFF"} />
+                                            <Icon name="favorite" size={30} color={favorito ? "#9D1FFF" : "#FFFFFF"} />
                                         </View>
-                                        <Text style={styles.textAction}>Salvar favoritos</Text>
+                                        <Text style={[styles.textAction, favorito ? {color: "#9D1FFF"} : {color: "#FFF"}]}>{favorito ? "Salvo" : "Salvar favoritos"}</Text>
                                     </TouchableOpacity>
                                 </View>
 
