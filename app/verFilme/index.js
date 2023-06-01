@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ActivityIndicator, Platform} from "react-native";
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, ActivityIndicator, Platform, ScrollView} from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import Play  from '@expo/vector-icons/Ionicons';
 import Download  from '@expo/vector-icons/MaterialCommunityIcons';
@@ -109,7 +109,7 @@ export default function VerFilme(){
                     
                 </ImageBackground>
 
-                <View style={styles.content}>
+                <ScrollView style={styles.content}>
                     <Text style={styles.title}>{filme.title}</Text>
 
                     <View style={styles.viewInfo}>
@@ -156,7 +156,7 @@ export default function VerFilme(){
                     </View>
 
                     <Text style={styles.tituloEnd}>TITULOS RECOMENDADOS</Text>
-                </View>
+                </ScrollView>
             </>
             )}
             
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         marginHorizontal: 20,
-        gap: 10
+        gap: 10,
     },
     viewInfo: {
         flexDirection: "row",
@@ -258,6 +258,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: "900",
-        marginTop: 5
+        marginTop: 5,
+        marginBottom: 50,
     }
 })
